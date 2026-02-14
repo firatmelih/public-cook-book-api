@@ -1,0 +1,11 @@
+### POST new user
+POST http://localhost:8080/posts
+Content-Type: application/json
+Authorization: Basic dXNlcjpwYXNzd29yZA==
+
+{
+  "id": 2,
+  "title": "first post",
+  "text": "welcome to my first post!",
+  "userId": 2
+}

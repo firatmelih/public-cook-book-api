@@ -1,0 +1,9 @@
+### PUT post
+PUT http://localhost:8080/posts/1
+Content-Type: application/json
+Authorization: Basic dXNlcjpwYXNzd29yZA==
+
+{
+  "title": "first post edited",
+  "text": "welcome to my first post! which is edited"
+}

@@ -1,0 +1,10 @@
+### POST new user
+POST http://localhost:8080/users
+Content-Type: application/json
+Authorization: Basic dXNlcjpwYXNzd29yZA==
+
+{
+  "id": 1,
+  "username": "jane",
+  "password": "janelovesjohn"
+}
