@@ -15,6 +15,13 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    // CREATE
+    public User createUser(User user) {
+        return userRepository.save(user);
+    }
+    // CREATE END
+
+    // READ
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -22,11 +29,9 @@ public class UserService {
     public User getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
+    // READ END
 
-    public User createUser(User user) {
-        return userRepository.save(user);
-    }
-
+    // UPDATE
     public User updateOneUser(Long id, User user) {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isPresent()) {
@@ -39,9 +44,13 @@ public class UserService {
             return null;
         }
     }
+    // UPDATE END
 
+    // DELETE
     public void deleteUserById(Long id) {
         userRepository.deleteById(id);
     }
+    // DELETE END
+
 
 }
