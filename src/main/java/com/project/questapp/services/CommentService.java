@@ -5,6 +5,7 @@ import com.project.questapp.entities.Post;
 import com.project.questapp.entities.User;
 import com.project.questapp.repositories.CommentRepository;
 import com.project.questapp.requests.CommentCreateRequest;
+import com.project.questapp.requests.CommentUpdateRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class CommentService {
     // CREATE
     public Comment createComment(CommentCreateRequest commentCreateRequest) {
         User user = userService.getUserById(commentCreateRequest.getUserId());
-        Post post = postService.getOnePostById(commentCreateRequest.getPostId());
+        Post post = postService.getPostEntityById(commentCreateRequest.getPostId());
         if (user == null || post == null) {
             return null;
         }
@@ -39,13 +40,13 @@ public class CommentService {
     // CREATE END
 
     // READ
-    public List<Comment> getComments(Optional<Long> postId, Optional<Long> userId) {
+    public List<Comment> getCommentsWithParams(Optional<Long> userId, Optional<Long> postId) {
         if (postId.isPresent() && userId.isPresent()) {
-            return commentRepository.getCommentsByPost_IdAndUser_Id(postId.get(), userId.get());
+            return commentRepository.findByUserIdAndPostId(userId.get(), postId.get());
         } else if (postId.isPresent()) {
-            return commentRepository.getCommentsByPost_Id(postId.get());
+            return commentRepository.findByPostId(postId.get());
         } else if (userId.isPresent()) {
-            return commentRepository.getCommentsByUser_Id(userId.get());
+            return commentRepository.findByUserId(userId.get());
         }
         return commentRepository.findAll();
     }
@@ -56,11 +57,11 @@ public class CommentService {
     // READ END
 
     // UPDATE
-    public Comment updateComment(Long commentId, CommentCreateRequest commentCreateRequest) {
+    public Comment updateComment(Long commentId, CommentUpdateRequest commentUpdateRequest) {
         Optional<Comment> comment = commentRepository.findById(commentId);
         if (comment.isPresent()) {
             Comment commentToUpdate = comment.get();
-            commentToUpdate.setText(commentCreateRequest.getText());
+            commentToUpdate.setText(commentUpdateRequest.getText());
             return commentRepository.save(commentToUpdate);
         }
         return null;
@@ -69,7 +70,7 @@ public class CommentService {
 
     // DELETE
     public void deleteComment(Long commentId) {
-        postService.deleteOnePostById(commentId);
+        commentRepository.deleteById(commentId);
     }
     // DELETE END
 

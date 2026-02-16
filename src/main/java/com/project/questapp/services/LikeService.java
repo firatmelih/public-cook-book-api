@@ -5,6 +5,7 @@ import com.project.questapp.entities.Post;
 import com.project.questapp.entities.User;
 import com.project.questapp.repositories.LikeRepository;
 import com.project.questapp.requests.LikeCreateRequest;
+import com.project.questapp.responses.LikeResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class LikeService {
     // CREATE
     public Like createLike(LikeCreateRequest likeCreateRequest) {
         User user = userService.getUserById(likeCreateRequest.getUserId());
-        Post post = postService.getOnePostById(likeCreateRequest.getPostId());
+        Post post = postService.getPostEntityById(likeCreateRequest.getPostId());
         if (user == null || post == null) {
             return null;
         }
@@ -38,15 +39,18 @@ public class LikeService {
     // CREATE END
 
     // READ
-    public List<Like> getLikes(Optional<Long> postId, Optional<Long> userId) {
+    public List<LikeResponse> getLikes(Optional<Long> userId, Optional<Long> postId) {
+        List<Like> like;
         if (postId.isPresent() && userId.isPresent()) {
-            return likeRepository.getLikeByUser_IdAndPost_Id(userId.get(), postId.get());
+            like = likeRepository.findByUserIdAndPostId(userId.get(), postId.get());
         } else if (postId.isPresent()) {
-            return likeRepository.getLikeByPost_Id(postId.get());
+            like = likeRepository.findByPostId(postId.get());
         } else if (userId.isPresent()) {
-            return likeRepository.getLikesByUserId(userId.get());
+            like = likeRepository.findByUserId(userId.get());
+        } else {
+            like = likeRepository.findAll();
         }
-        return likeRepository.findAll();
+        return like.stream().map(LikeResponse::new).toList();
     }
 
     public Like getLikeById(Long likeId) {
@@ -59,7 +63,7 @@ public class LikeService {
 
     // DELETE
     public void deleteLike(Long likeId) {
-        postService.deleteOnePostById(likeId);
+        likeRepository.deleteById(likeId);
     }
     // DELETE END
 
