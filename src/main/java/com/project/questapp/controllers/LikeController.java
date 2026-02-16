@@ -25,7 +25,7 @@ public class LikeController {
     }
 
     @GetMapping("/{likeId}")
-    public Like getLikeByLikeId(@PathVariable Long likeId) {
+    public LikeResponse getLikeByLikeId(@PathVariable Long likeId) {
         return likeService.getLikeById(likeId);
     }
 

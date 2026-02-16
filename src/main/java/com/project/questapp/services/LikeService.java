@@ -53,8 +53,9 @@ public class LikeService {
         return like.stream().map(LikeResponse::new).toList();
     }
 
-    public Like getLikeById(Long likeId) {
-        return likeRepository.findById(likeId).orElse(null);
+    public LikeResponse getLikeById(Long likeId) {
+        Like like = likeRepository.findById(likeId).get();
+        return new LikeResponse(like);
     }
     // READ END
 
