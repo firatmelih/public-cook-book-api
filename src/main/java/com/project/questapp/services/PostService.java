@@ -7,7 +7,6 @@ import com.project.questapp.requests.PostCreateRequest;
 import com.project.questapp.requests.PostUpdateRequest;
 import com.project.questapp.responses.PostResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,12 +17,10 @@ import java.util.Optional;
 public class PostService {
     private final PostRepository postRepository;
     private final UserService userService;
-    private final LikeService likeService;
 
-    public PostService(PostRepository postRepository, UserService userService, @Lazy LikeService likeService) {
+    public PostService(PostRepository postRepository, UserService userService) {
         this.postRepository = postRepository;
         this.userService = userService;
-        this.likeService = likeService;
     }
 
     // CREATE
