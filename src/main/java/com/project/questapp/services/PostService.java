@@ -6,9 +6,12 @@ import com.project.questapp.repositories.PostRepository;
 import com.project.questapp.requests.PostCreateRequest;
 import com.project.questapp.requests.PostUpdateRequest;
 import com.project.questapp.responses.PostResponse;
+import com.project.questapp.security.JwtTokenProvider;
+import com.project.questapp.security.JwtUserDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,23 +21,22 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserService userService;
 
-    public PostService(PostRepository postRepository, UserService userService) {
+    public PostService(PostRepository postRepository, UserService userService, JwtTokenProvider jwtTokenProvider) {
         this.postRepository = postRepository;
         this.userService = userService;
     }
 
     // CREATE
-    public Post createOnePost(PostCreateRequest postCreateRequest) {
-        User user = userService.getUserById(postCreateRequest.getUserId());
-        if (user == null) {
-            return null;
-        }
+    public PostResponse createOnePost(JwtUserDetails userDetails, PostCreateRequest request) {
+        User user = userService.getUserById(userDetails.getId());
+
         Post toSave = new Post();
-        toSave.setId(postCreateRequest.getId());
-        toSave.setTitle(postCreateRequest.getTitle());
         toSave.setUser(user);
-        toSave.setText(postCreateRequest.getText());
-        return postRepository.save(toSave);
+        toSave.setTitle(request.getTitle());
+        toSave.setText(request.getText());
+        toSave.setCreateDate(LocalDateTime.now());
+
+        return new PostResponse(postRepository.save(toSave));
     }
     // CREATE END
 

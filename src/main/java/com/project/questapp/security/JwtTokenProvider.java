@@ -1,8 +1,9 @@
 package com.project.questapp.security;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -13,76 +14,55 @@ import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
+
     @Value("${questapp.app.secret}")
     private String APP_SECRET;
+
     @Value("${questapp.expires.in}")
     private long EXPIRES_IN;
 
+    private SecretKey key;
+
+    @PostConstruct
+    protected void init() {
+        // Ensure the secret is long enough for HMAC-SHA algorithms (at least 32 characters)
+        this.key = Keys.hmacShaKeyFor(APP_SECRET.getBytes(StandardCharsets.UTF_8));
+    }
+
     public String generateJwtToken(Authentication authentication) {
         JwtUserDetails userDetails = (JwtUserDetails) authentication.getPrincipal();
-        Date expireDate = new Date(new Date().getTime() + EXPIRES_IN);
-        SecretKey key = Keys.hmacShaKeyFor(APP_SECRET.getBytes(StandardCharsets.UTF_8));
-        if (userDetails == null) {
-            throw new IllegalStateException("User context is missing!");
-        }
+        Date now = new Date();
+        Date expireDate = new Date(now.getTime() + EXPIRES_IN);
+
         return Jwts.builder()
                 .subject(Long.toString(userDetails.getId()))
-                .issuedAt(new Date())
+                .issuedAt(now)
                 .expiration(expireDate)
                 .signWith(key)
                 .compact();
     }
 
-    Long getUserIdFromJwt(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(APP_SECRET.getBytes(StandardCharsets.UTF_8));
-
+    public Long getUserIdFromJwt(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+
         return Long.parseLong(claims.getSubject());
     }
 
-    boolean validateJwtToken(String authToken) {
+    public boolean validateJwtToken(String authToken) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(APP_SECRET.getBytes(StandardCharsets.UTF_8));
-
+            // Do NOT strip "Bearer " here again. The Filter already did it.
             Jwts.parser()
                     .verifyWith(key)
                     .build()
                     .parseSignedClaims(authToken);
-
             return true;
-
-        } catch (MalformedJwtException e) {
-            System.out.println("Invalid JWT token: " + e.getMessage());
-        } catch (ExpiredJwtException e) {
-            System.out.println("JWT token is expired: " + e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            System.out.println("JWT token is unsupported: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            System.out.println("JWT claims string is empty: " + e.getMessage());
-        } catch (SecurityException | SignatureException e) {
-            System.out.println("Invalid JWT signature: " + e.getMessage());
-        }
-        return false;
-    }
-
-    private boolean isTokenExpired(String token) {
-        try {
-            SecretKey key = Keys.hmacShaKeyFor(APP_SECRET.getBytes(StandardCharsets.UTF_8));
-            Date expiration = Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .getExpiration();
-            return expiration.before(new Date());
         } catch (Exception e) {
-            return true;
+            // ... error handling
+            return false;
         }
     }
-
-
 }

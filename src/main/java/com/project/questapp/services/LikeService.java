@@ -6,8 +6,10 @@ import com.project.questapp.entities.User;
 import com.project.questapp.repositories.LikeRepository;
 import com.project.questapp.requests.LikeCreateRequest;
 import com.project.questapp.responses.LikeResponse;
+import com.project.questapp.security.JwtUserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,16 +26,16 @@ public class LikeService {
     }
 
     // CREATE
-    public Like createLike(LikeCreateRequest likeCreateRequest) {
-        User user = userService.getUserById(likeCreateRequest.getUserId());
+    public Like createLike(JwtUserDetails userDetails, LikeCreateRequest likeCreateRequest) {
+        User user = userService.getUserById(userDetails.getId());
         Post post = postService.getPostEntityById(likeCreateRequest.getPostId());
         if (user == null || post == null) {
             return null;
         }
         Like likeToSave = new Like();
-        likeToSave.setId(likeCreateRequest.getId());
         likeToSave.setUser(user);
         likeToSave.setPost(post);
+        likeToSave.setCreateDate(LocalDateTime.now());
         return likeRepository.save(likeToSave);
     }
     // CREATE END

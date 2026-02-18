@@ -3,7 +3,9 @@ package com.project.questapp.controllers;
 import com.project.questapp.entities.Like;
 import com.project.questapp.requests.LikeCreateRequest;
 import com.project.questapp.responses.LikeResponse;
+import com.project.questapp.security.JwtUserDetails;
 import com.project.questapp.services.LikeService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,8 +32,8 @@ public class LikeController {
     }
 
     @PostMapping
-    public Like createLike(@RequestBody LikeCreateRequest likeCreateRequest) {
-        return likeService.createLike(likeCreateRequest);
+    public Like createLike(@AuthenticationPrincipal JwtUserDetails userDetails, @RequestBody LikeCreateRequest likeCreateRequest) {
+        return likeService.createLike(userDetails, likeCreateRequest);
     }
 
     @DeleteMapping("/{likeId}")

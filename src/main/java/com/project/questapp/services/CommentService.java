@@ -6,8 +6,10 @@ import com.project.questapp.entities.User;
 import com.project.questapp.repositories.CommentRepository;
 import com.project.questapp.requests.CommentCreateRequest;
 import com.project.questapp.requests.CommentUpdateRequest;
+import com.project.questapp.security.JwtUserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,17 +26,18 @@ public class CommentService {
     }
 
     // CREATE
-    public Comment createComment(CommentCreateRequest commentCreateRequest) {
-        User user = userService.getUserById(commentCreateRequest.getUserId());
+    public Comment createComment(JwtUserDetails userDetails, CommentCreateRequest commentCreateRequest) {
+        User user = userService.getUserById(userDetails.getId());
         Post post = postService.getPostEntityById(commentCreateRequest.getPostId());
+
         if (user == null || post == null) {
             return null;
         }
         Comment commentToSave = new Comment();
-        commentToSave.setId(commentCreateRequest.getId());
         commentToSave.setText(commentCreateRequest.getText());
         commentToSave.setUser(user);
         commentToSave.setPost(post);
+        commentToSave.setCreateDate(LocalDateTime.now());
         return commentRepository.save(commentToSave);
     }
     // CREATE END

@@ -6,11 +6,14 @@ import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "likes")
 @Data
 public class Like {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @ManyToOne(fetch = FetchType.LAZY) // FetchType.EAGER would bring user's data from request to post
@@ -24,4 +27,8 @@ public class Like {
     @OnDelete(action = OnDeleteAction.CASCADE) // if user deleted, delete their posts
     @JsonIgnore // serialization ignore bcs we won't fetch
     Post post;
+
+
+    @Column(name = "created_at", nullable = false)
+    LocalDateTime createDate;
 }

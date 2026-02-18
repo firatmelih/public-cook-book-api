@@ -4,7 +4,9 @@ import com.project.questapp.entities.Post;
 import com.project.questapp.requests.PostCreateRequest;
 import com.project.questapp.requests.PostUpdateRequest;
 import com.project.questapp.responses.PostResponse;
+import com.project.questapp.security.JwtUserDetails;
 import com.project.questapp.services.PostService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,8 +32,9 @@ public class PostController {
     }
 
     @PostMapping
-    public Post createOnePost(@RequestBody PostCreateRequest newPostRequest) {
-        return postService.createOnePost(newPostRequest);
+    public PostResponse createOnePost(@AuthenticationPrincipal JwtUserDetails userDetails,
+                                      @RequestBody PostCreateRequest request) {
+        return postService.createOnePost(userDetails, request);
     }
 
     @PutMapping("/{postId}")

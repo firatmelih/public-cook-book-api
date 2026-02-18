@@ -6,11 +6,14 @@ import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "comments")
 @Data
 public class Comment {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @ManyToOne(fetch = FetchType.LAZY) // FetchType.EAGER would bring user's data from request to post
@@ -28,4 +31,7 @@ public class Comment {
     @Lob
     @Column(columnDefinition = "TEXT")
     String text;
+
+    @Column(name = "created_at", nullable = false)
+    LocalDateTime createDate;
 }

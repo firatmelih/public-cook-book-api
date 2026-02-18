@@ -4,6 +4,7 @@ import com.project.questapp.entities.Post;
 import lombok.Data;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class PostResponse {
@@ -20,8 +21,13 @@ public class PostResponse {
         this.username = entity.getUser().getUsername();
         this.title = entity.getTitle();
         this.text = entity.getText();
-        this.postLikes = entity.getLikes().stream()
-                .map(LikeResponse::new)
-                .toList();
+
+        if (entity.getLikes() != null) {
+            this.postLikes = entity.getLikes().stream()
+                    .map(LikeResponse::new)
+                    .collect(Collectors.toList());
+        } else {
+            this.postLikes = List.of(); // Returns an empty immutable list
+        }
     }
 }

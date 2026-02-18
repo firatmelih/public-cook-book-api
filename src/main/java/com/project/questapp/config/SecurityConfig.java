@@ -84,6 +84,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/comments/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/likes").permitAll()
                         .requestMatchers(HttpMethod.GET, "/likes/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/activities/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated()
                 );
